@@ -20,9 +20,18 @@ namespace RemoteServer
 		[STAThread]
 		static void Main(string[] args)
 		{
-			var p = new Monitor();
-			Application.ThreadException += (o, e) => p.Log(e.Exception);			
-			Application.Run();
+			try
+			{
+				var p = new Monitor();
+				Application.ThreadException += (o, e) => p.Log(e.Exception);
+				Application.Run();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, "FtpSync", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Log(String.Format("Exception: {0}\r\n{1}", ex.Message, ex.StackTrace));
+				Application.Exit();
+			}			
 		}
 
 		public Program()
@@ -62,7 +71,7 @@ namespace RemoteServer
 			};
 		}
 
-		public void Log(string message)
+		public static void Log(string message)
 		{
 			File.AppendAllText(logFile, String.Format("[{0}] {1}\r\n", DateTime.Now, message));
 		}

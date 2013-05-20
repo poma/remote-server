@@ -6,6 +6,7 @@ using System.Text;
 using System.Net;
 using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace RemoteServer
 {
@@ -25,8 +26,29 @@ namespace RemoteServer
 		public void StartServer()
 		{
 			_server = new HttpListener();
-			_server.Prefixes.Add("http://localhost:8080/");
-			_server.Start();
+			string prefix = String.Format("http://*:{0}/", Settings.Port);
+			_server.Prefixes.Add(prefix);
+
+			try
+			{
+				_server.Start();
+			}
+			catch (HttpListenerException ex)
+			{
+				if (ex.ErrorCode == 5)
+				{
+					var username = Environment.GetEnvironmentVariable("USERNAME");
+					var userdomain = Environment.GetEnvironmentVariable("USERDOMAIN");
+					var message = String.Format("netsh http add urlacl url={0} user={1}\\{2} listen=yes", prefix, userdomain, username);
+					Clipboard.SetText(message);
+					MessageBox.Show("Run command (copied to clipboard): \r\n" + message);
+					Application.Exit();
+				}
+				else
+				{
+					throw;
+				}
+			}
 		}
 
 		public void Listen()
@@ -55,12 +77,21 @@ namespace RemoteServer
 		{
 			try
 			{
-				Action<NameValueCollection> handler = null;
-				if (RequestHandler.Handlers.TryGetValue(request.Url.AbsolutePath, out handler))
+				if (request.Url.AbsolutePath == "/remote")
 				{
-					Log("Request: " + request.Url.ToString());
-					handler(request.QueryString);
-					return "ok";
+					var key = request.QueryString["key"];
+					Action handler = null;
+					if (key != null && RequestHandler.Handlers.TryGetValue(key, out handler))
+					{
+						Log("Keypress: " + key);
+						handler();
+						return "ok";
+					}
+					else
+					{
+						Log("Unknown key: " + key);
+						return "missed-key";
+					}
 				}
 				else
 				{

@@ -9,14 +9,14 @@ namespace RemoteServer
 {
 	public static class RequestHandler
 	{
-		public static Dictionary<string, Action<NameValueCollection>> Handlers = new Dictionary<string, Action<NameValueCollection>>
+		public static Dictionary<string, Action> Handlers = new Dictionary<string, Action>
 		{
-			{"/test", Test}
+			{"key_test", Test}
 		};
 
-		public static void Test(NameValueCollection args)
+		public static void Test()
 		{
-			MessageBox.Show("Test. qwe=" + args["qwe"]);
+			MessageBox.Show("Test-key");
 		}
 	}
 }
