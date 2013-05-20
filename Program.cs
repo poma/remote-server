@@ -14,13 +14,13 @@ namespace RemoteServer
 	{
 		internal static Properties.Settings Settings { get { return Properties.Settings.Default; } }
 		public const string logFile = "log.txt";
-		public const string AppName = "FTP Sync";
+		public const string AppName = "Irda monitor";
 		protected NotifyIcon icon;
 
 		[STAThread]
 		static void Main(string[] args)
 		{
-			var p = new Program();
+			var p = new Monitor();
 			Application.ThreadException += (o, e) => p.Log(e.Exception);			
 			Application.Run();
 		}
@@ -69,6 +69,12 @@ namespace RemoteServer
 		public void Log(Exception e)
 		{
 			Log(String.Format("Exception: {0}\r\n{1}", e.Message, e.StackTrace));
+			if (icon != null)
+				icon.ShowBalloonTip(1000, "Error", e.Message, ToolTipIcon.Error);
+		}
+		public void Log(string message, Exception e)
+		{
+			Log(String.Format("{0}: {1}\r\n{2}", message, e.Message, e.StackTrace));
 			if (icon != null)
 				icon.ShowBalloonTip(1000, "Error", e.Message, ToolTipIcon.Error);
 		}
