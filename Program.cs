@@ -12,6 +12,7 @@ namespace RemoteServer
 {
 	public class Program
 	{
+		public static Program Instance { get; private set; }
 		internal static Properties.Settings Settings { get { return Properties.Settings.Default; } }
 		public const string logFile = "log.txt";
 		public const string AppName = "Irda monitor";
@@ -22,8 +23,8 @@ namespace RemoteServer
 		{
 			try
 			{
-				var p = new Monitor();
-				Application.ThreadException += (o, e) => p.Log(e.Exception);
+				Instance = new Monitor();
+				Application.ThreadException += (o, e) => Instance.Log(e.Exception);
 				Application.Run();
 			}
 			catch (Exception ex)

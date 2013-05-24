@@ -11,44 +11,79 @@ namespace RemoteServer
 {
 	public static class RequestHandler
 	{
-		public static Dictionary<string, Action> Handlers = new Dictionary<string, Action>
+		public static Dictionary<string, VirtualKeyCode> SingleMediaKeys = new Dictionary<string, VirtualKeyCode>
 		{
-			{"key_test", Test},
-			{"volume_up", VolumeUp},
-			{"volume_down", VolumeDown},
-			{"mute", Mute},
-			{"play", PlayPause}
+			{"KEY_PLAY", VirtualKeyCode.PLAY},
+			{"KEY_PAUSE", VirtualKeyCode.PAUSE},
+			{"KEY_STOP", VirtualKeyCode.MEDIA_STOP},
+			{"KEY_REWIND", VirtualKeyCode.MEDIA_PREV_TRACK},
+			{"KEY_FORWARD", VirtualKeyCode.MEDIA_NEXT_TRACK},
+			{"KEY_MUTE", VirtualKeyCode.VOLUME_MUTE}
 		};
+
+		public static Dictionary<string, VirtualKeyCode> MultipleMediaKeys = new Dictionary<string, VirtualKeyCode>
+		{
+			{"KEY_VOLUMEUP", VirtualKeyCode.VOLUME_UP},
+			{"KEY_VOLUMEDOWN", VirtualKeyCode.VOLUME_DOWN}
+		};
+
+		public static Dictionary<string, Action> SingleHandlers = new Dictionary<string, Action>
+		{
+			{"KEY_MENU", Test}
+		};
+
+		public static Dictionary<string, Action<int>> MultipleHandlers = new Dictionary<string, Action<int>>
+		{
+			{"KEY_MENU2", Test2}
+		};
+
+		public static string HandleKeypress(string key, string s_count)
+		{
+			if (key == null) return "empty-key";
+			Log("Keypress: " + key);
+			int count = String.IsNullOrEmpty(s_count) ? 0 : int.Parse(s_count);
+			if (SingleMediaKeys.ContainsKey(key))
+			{
+				if (count == 1)
+					InputSimulator.SimulateKeyPress(SingleMediaKeys[key]);
+			}
+			else if (MultipleMediaKeys.ContainsKey(key))
+			{
+				InputSimulator.SimulateKeyPress(MultipleMediaKeys[key]);
+			}
+			else if (SingleHandlers.ContainsKey(key))
+			{
+				if (count == 1)
+					SingleHandlers[key]();
+			}
+			else if (MultipleHandlers.ContainsKey(key))
+			{
+				MultipleHandlers[key](count);
+			}
+			else
+			{
+				Log("Unknown key: " + key);
+				return "missed-key";
+			}
+			return "ok";
+		}
 
 		public static void Test()
 		{
+			
 			MessageBox.Show("Test-key");
 		}
 
-		public static void VolumeUp()
+		public static void Test2(int count)
 		{
-			InputSimulator.SimulateKeyPress(VirtualKeyCode.VOLUME_UP);
-			//var device = new MMDeviceEnumerator().GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-			//device.AudioEndpointVolume.VolumeStepUp();
+			MessageBox.Show("Test-key 2 - " + count);
 		}
 
-		public static void VolumeDown()
-		{
-			InputSimulator.SimulateKeyPress(VirtualKeyCode.VOLUME_DOWN);
-			//var device = new MMDeviceEnumerator().GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-			//device.AudioEndpointVolume.VolumeStepDown();
-		}
+		
 
-		public static void Mute()
+		private static void Log(string message)
 		{
-			InputSimulator.SimulateKeyPress(VirtualKeyCode.VOLUME_MUTE);
-			//var device = new MMDeviceEnumerator().GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-			//device.AudioEndpointVolume.Mute = !device.AudioEndpointVolume.Mute;
-		}
-
-		public static void PlayPause()
-		{
-			InputSimulator.SimulateKeyPress(VirtualKeyCode.MEDIA_PLAY_PAUSE);
+			Program.Log(message);
 		}
 	}
 }

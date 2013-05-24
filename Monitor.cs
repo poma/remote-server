@@ -73,25 +73,16 @@ namespace RemoteServer
 			}
 		}
 
+
 		public string HandleRequest(HttpListenerRequest request)
 		{
 			try
 			{
 				if (request.Url.AbsolutePath == "/remote")
 				{
-					var key = request.QueryString["key"];
-					Action handler = null;
-					if (key != null && RequestHandler.Handlers.TryGetValue(key, out handler))
-					{
-						Log("Keypress: " + key);
-						handler();
-						return "ok";
-					}
-					else
-					{
-						Log("Unknown key: " + key);
-						return "missed-key";
-					}
+					string key = request.QueryString["key"];
+					string count = request.QueryString["count"];
+					return RequestHandler.HandleKeypress(key, count);
 				}
 				else
 				{
