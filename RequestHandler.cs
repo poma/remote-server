@@ -35,7 +35,7 @@ namespace RemoteServer
 
 		public static Dictionary<string, Action> SingleHandlers = new Dictionary<string, Action>
 		{
-			{"KEY_MENU", Test}
+			{"KEY_MENU3", Test}
 		};
 
 		public static Dictionary<string, Action<int>> MultipleHandlers = new Dictionary<string, Action<int>>
