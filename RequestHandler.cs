@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using WindowsInput;
 using System.Diagnostics;
 using RemoteServer.Properties;
+using System.Globalization;
 
 namespace RemoteServer
 {
@@ -13,8 +14,8 @@ namespace RemoteServer
 	{
 		public static Dictionary<string, VirtualKeyCode> SingleMediaKeys = new Dictionary<string, VirtualKeyCode>
 		{
-			{"KEY_PLAY", VirtualKeyCode.PLAY},
-			{"KEY_PAUSE", VirtualKeyCode.PAUSE},
+			{"KEY_PLAY", VirtualKeyCode.MEDIA_PLAY_PAUSE},
+			{"KEY_PAUSE", VirtualKeyCode.MEDIA_PLAY_PAUSE},
 			{"KEY_STOP", VirtualKeyCode.MEDIA_STOP},
 			{"KEY_REWIND", VirtualKeyCode.MEDIA_PREV_TRACK},
 			{"KEY_FORWARD", VirtualKeyCode.MEDIA_NEXT_TRACK},
@@ -47,15 +48,15 @@ namespace RemoteServer
 		{
 			if (key == null) return "empty-key";
 			Log("Keypress: " + key);
-			int count = String.IsNullOrEmpty(s_count) ? 1 : int.Parse(s_count);
+			int count = String.IsNullOrEmpty(s_count) ? 1 : int.Parse(s_count, NumberStyles.HexNumber);
 
-			if (count == 1)
+			if (count == 0)
 			{
 				SingleMediaKeys.Apply(key, InputSimulator.SimulateKeyPress);
 				WinampLists.Apply(key, val => Process.Start(Settings.WinampPath, String.Format(@"{0}\{1}.m3u", Settings.WinampPlaylistPath, val)));
 				SingleHandlers.Apply(key, act => act());
 			}
-			
+
 			MultipleMediaKeys.Apply(key, InputSimulator.SimulateKeyPress);
 			MultipleHandlers.Apply(key, act => act(count));
 
