@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using CoreAudioApi;
 using WindowsInput;
+using System.Diagnostics;
+using RemoteServer.Properties;
 
 namespace RemoteServer
 {
@@ -27,6 +27,12 @@ namespace RemoteServer
 			{"KEY_VOLUMEDOWN", VirtualKeyCode.VOLUME_DOWN}
 		};
 
+		public static Dictionary<string, string> WinampLists = new Dictionary<string, string>
+		{
+			{"KEY_1", "enigma"},
+			{"KEY_2", "poets"}
+		};
+
 		public static Dictionary<string, Action> SingleHandlers = new Dictionary<string, Action>
 		{
 			{"KEY_MENU", Test}
@@ -41,36 +47,23 @@ namespace RemoteServer
 		{
 			if (key == null) return "empty-key";
 			Log("Keypress: " + key);
-			int count = String.IsNullOrEmpty(s_count) ? 0 : int.Parse(s_count);
-			if (SingleMediaKeys.ContainsKey(key))
+			int count = String.IsNullOrEmpty(s_count) ? 1 : int.Parse(s_count);
+
+			if (count == 1)
 			{
-				if (count == 1)
-					InputSimulator.SimulateKeyPress(SingleMediaKeys[key]);
+				SingleMediaKeys.Apply(key, InputSimulator.SimulateKeyPress);
+				WinampLists.Apply(key, val => Process.Start(Settings.WinampPath, String.Format(@"{0}\{1}.m3u", Settings.WinampPlaylistPath, val)));
+				SingleHandlers.Apply(key, act => act());
 			}
-			else if (MultipleMediaKeys.ContainsKey(key))
-			{
-				InputSimulator.SimulateKeyPress(MultipleMediaKeys[key]);
-			}
-			else if (SingleHandlers.ContainsKey(key))
-			{
-				if (count == 1)
-					SingleHandlers[key]();
-			}
-			else if (MultipleHandlers.ContainsKey(key))
-			{
-				MultipleHandlers[key](count);
-			}
-			else
-			{
-				Log("Unknown key: " + key);
-				return "missed-key";
-			}
+			
+			MultipleMediaKeys.Apply(key, InputSimulator.SimulateKeyPress);
+			MultipleHandlers.Apply(key, act => act(count));
+
 			return "ok";
 		}
 
 		public static void Test()
-		{
-			
+		{			
 			MessageBox.Show("Test-key");
 		}
 
@@ -80,10 +73,19 @@ namespace RemoteServer
 		}
 
 		
-
+		private static Settings Settings { get { return Properties.Settings.Default; } }
 		private static void Log(string message)
 		{
 			Program.Log(message);
+		}
+	}
+
+	public static class Extensions
+	{
+		public static void Apply<T>(this Dictionary<string, T> dic, string key, Action<T> action)
+		{
+			if (dic.ContainsKey(key))
+				action(dic[key]);
 		}
 	}
 }

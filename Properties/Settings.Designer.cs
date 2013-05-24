@@ -31,5 +31,23 @@ namespace RemoteServer.Properties {
                 return ((int)(this["Port"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\Winamp\\winamp.exe")]
+        public string WinampPath {
+            get {
+                return ((string)(this["WinampPath"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("V:\\playlists")]
+        public string WinampPlaylistPath {
+            get {
+                return ((string)(this["WinampPlaylistPath"]));
+            }
+        }
     }
 }
