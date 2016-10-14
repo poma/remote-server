@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="Port" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">8080</Value>
+      <Value Profile="(Default)">5112</Value>
     </Setting>
     <Setting Name="WinampPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\Program Files (x86)\Winamp\winamp.exe</Value>

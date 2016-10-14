@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Net;
 using System.Windows.Forms;
 using System.Diagnostics;
-using System.Data;
 
 namespace RemoteServer
 {
@@ -29,16 +27,16 @@ namespace RemoteServer
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message, "FtpSync", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Log(String.Format("Exception: {0}\r\n{1}", ex.Message, ex.StackTrace));
+				MessageBox.Show(ex.Message, AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Log($"Exception: {ex}");
 				Application.Exit();
-			}			
+			}
 		}
 
 		public Program()
 		{
 			InitTrayIcon();
-			//Log(String.Format("Sync started. Local path: {0}, Remote path: {1}", Settings.LocalPath, Settings.RemotePath));
+			Log($"Listening on port {Settings.Port}");
 		}
 
 		private void InitTrayIcon()
@@ -74,17 +72,15 @@ namespace RemoteServer
 
 		public static void Log(string message)
 		{
-			File.AppendAllText(logFile, String.Format("[{0}] {1}\r\n", DateTime.Now, message));
+			File.AppendAllText(logFile, $"[{DateTime.Now}] {message}\r\n");
 		}
 		public void Log(Exception e)
 		{
-			Log(String.Format("Exception: {0}\r\n{1}", e.Message, e.StackTrace));
-			if (icon != null)
-				icon.ShowBalloonTip(1000, "Error", e.Message, ToolTipIcon.Error);
+			Log(e, "Exception");
 		}
-		public void Log(string message, Exception e)
+		public void Log(Exception e, string message)
 		{
-			Log(String.Format("{0}: {1}\r\n{2}", message, e.Message, e.StackTrace));
+			Log($"{message}: {e}");
 			if (icon != null)
 				icon.ShowBalloonTip(1000, "Error", e.Message, ToolTipIcon.Error);
 		}

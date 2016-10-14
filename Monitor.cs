@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -17,16 +16,14 @@ namespace RemoteServer
 		public Monitor()
 		{
 			StartServer();
-			Log(String.Format("Server started on port {0}", Settings.Port));
-			var t = new Thread(Listen);
-			t.IsBackground = true;
-			t.Start();
+			Log($"Server started on port {Settings.Port}");
+			new Thread(Listen) { IsBackground = true, Name = "Listener" }.Start();
 		}
 
 		public void StartServer()
 		{
 			_server = new HttpListener();
-			string prefix = String.Format("http://*:{0}/", Settings.Port);
+			string prefix = $"http://*:{Settings.Port}/";
 			_server.Prefixes.Add(prefix);
 
 			try
@@ -68,7 +65,7 @@ namespace RemoteServer
 				}
 				catch (Exception ex)
 				{
-					Log("Listener error", ex);
+					Log(ex, "Listener error");
 				}
 			}
 		}
@@ -92,7 +89,7 @@ namespace RemoteServer
 			}
 			catch (Exception ex)
 			{
-				Log("Handler exception", ex);
+				Log(ex, "Handler exception");
 				return "Error: " + ex.Message;
 			}
 		}
