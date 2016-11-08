@@ -49,5 +49,23 @@ namespace RemoteServer.Properties {
                 return ((string)(this["WinampPlaylistPath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3000")]
+        public int YoutubeDelay {
+            get {
+                return ((int)(this["YoutubeDelay"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("log.txt")]
+        public string LogFile {
+            get {
+                return ((string)(this["LogFile"]));
+            }
+        }
     }
 }

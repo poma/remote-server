@@ -10,11 +10,10 @@ namespace RemoteServer
 {
 	public class Program
 	{
+		public const string AppName = "Irda monitor";
 		public static Program Instance { get; private set; }
 		internal static Properties.Settings Settings { get { return Properties.Settings.Default; } }
-		public const string logFile = "log.txt";
-		public const string AppName = "Irda monitor";
-		protected NotifyIcon icon;
+		protected NotifyIcon _icon;
 
 		[STAThread]
 		static void Main(string[] args)
@@ -36,43 +35,42 @@ namespace RemoteServer
 		public Program()
 		{
 			InitTrayIcon();
-			Log($"Listening on port {Settings.Port}");
 		}
 
 		private void InitTrayIcon()
 		{
-			ContextMenuStrip context = new ContextMenuStrip();
-			context.Items.AddRange(new ToolStripItem[] 
+			ContextMenuStrip menu = new ContextMenuStrip();
+			menu.Items.AddRange(new ToolStripItem[] 
 			{
-				new ToolStripMenuItem("Show log", null, (q, w) => Process.Start(logFile)),
-				new ToolStripMenuItem("Clear log", null, (q, w) => File.Delete(logFile)),
+				new ToolStripMenuItem("Show log", null, (q, w) => Process.Start(Settings.LogFile)),
+				new ToolStripMenuItem("Clear log", null, (q, w) => File.Delete(Settings.LogFile)),
 				new ToolStripMenuItem("Open app location", null, (q, w) => Process.Start(Path.GetDirectoryName(Application.ExecutablePath))),
 				new ToolStripMenuItem("Exit", null, (q, w) => Application.Exit())
 			});
 
-			icon = new NotifyIcon()
+			_icon = new NotifyIcon()
 			{
 				Icon = Properties.Resources.synchronize,
 				Text = AppName,
-				ContextMenuStrip = context,
+				ContextMenuStrip = menu,
 				Visible = true
 			};
-			icon.MouseClick += (obj, args) =>
+			_icon.MouseClick += (obj, args) =>
 			{
 				if (args.Button == MouseButtons.Left)
-					Process.Start(logFile);
+					Process.Start(Settings.LogFile);
 			};
 
 			Application.ApplicationExit += (obj, args) =>
 			{
-				icon.Dispose();
-				context.Dispose();
+				_icon.Dispose();
+				menu.Dispose();
 			};
 		}
 
 		public static void Log(string message)
 		{
-			File.AppendAllText(logFile, $"[{DateTime.Now}] {message}\r\n");
+			File.AppendAllText(Settings.LogFile, $"[{DateTime.Now}] {message}\r\n");
 		}
 		public void Log(Exception e)
 		{
@@ -81,8 +79,8 @@ namespace RemoteServer
 		public void Log(Exception e, string message)
 		{
 			Log($"{message}: {e}");
-			if (icon != null)
-				icon.ShowBalloonTip(1000, "Error", e.Message, ToolTipIcon.Error);
+			if (_icon != null)
+				_icon.ShowBalloonTip(1000, "Error", e.Message, ToolTipIcon.Error);
 		}
 	}
 }

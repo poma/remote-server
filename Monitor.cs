@@ -11,12 +11,11 @@ namespace RemoteServer
 {
 	public class Monitor: Program
 	{
-		HttpListener _server;
+		private HttpListener _server;
 
 		public Monitor()
 		{
 			StartServer();
-			Log($"Server started on port {Settings.Port}");
 			new Thread(Listen) { IsBackground = true, Name = "Listener" }.Start();
 		}
 
@@ -29,6 +28,7 @@ namespace RemoteServer
 			try
 			{
 				_server.Start();
+				Log($"Server started on port {Settings.Port}");
 			}
 			catch (HttpListenerException ex)
 			{
@@ -36,7 +36,7 @@ namespace RemoteServer
 				{
 					var username = Environment.GetEnvironmentVariable("USERNAME");
 					var userdomain = Environment.GetEnvironmentVariable("USERDOMAIN");
-					var message = String.Format("netsh http add urlacl url={0} user={1}\\{2} listen=yes", prefix, userdomain, username);
+					var message = $"netsh http add urlacl url={prefix} user={userdomain}\\{username} listen=yes";
 					Clipboard.SetText(message);
 					MessageBox.Show("Run command (copied to clipboard): \r\n" + message);
 					Application.Exit();

@@ -11,5 +11,11 @@
     <Setting Name="WinampPlaylistPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">V:\playlists</Value>
     </Setting>
+    <Setting Name="YoutubeDelay" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">3000</Value>
+    </Setting>
+    <Setting Name="LogFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">log.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

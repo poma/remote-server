@@ -7,6 +7,7 @@ using WindowsInput.Native;
 using System.Diagnostics;
 using RemoteServer.Properties;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace RemoteServer
 {
@@ -44,7 +45,8 @@ namespace RemoteServer
 		public static Dictionary<string, Action> SingleHandlers = new Dictionary<string, Action>
 		{
 			{"KEY_OK", () => InputSimulator.Mouse.LeftButtonClick()},
-			{"KEY_MENU", () => InputSimulator.Mouse.RightButtonClick()}
+			{"KEY_MENU", () => InputSimulator.Mouse.RightButtonClick()},
+			{"KEY_NUMERIC_STAR", () => InputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_W) },
 		};
 
 		/// <summary>
@@ -58,11 +60,17 @@ namespace RemoteServer
 			{"KEY_DOWN", MouseDown}
 		};
 
-		public static Dictionary<string, string> WinampLists = new Dictionary<string, string>
+		public static Dictionary<string, string> YoutubeLists = new Dictionary<string, string>
 		{
-			{"KEY_1", "enigma"},
-			{"KEY_2", "morcheeba"},
-			{"KEY_0", "all"}
+			{"KEY_1", "OT9tqddn9PY"},
+			{"KEY_2", "RV2V4WEg5Hc"},
+			{"KEY_3", "TKfKWzCBTm4"},
+			{"KEY_4", "8c0M7p49Acs"},
+			{"KEY_5", "6y_NJg-xoeE"},
+			{"KEY_6", "wBHNyd0IL7k"},
+			{"KEY_7", "1dcXmkco5ko"},
+			{"KEY_8", "usXhiWE2Uc0"},
+			{"KEY_9", "ddFAIkUb7A0"},
 		};
 
 
@@ -74,11 +82,10 @@ namespace RemoteServer
 			Log("Keypress: " + key);
 			int count = String.IsNullOrEmpty(s_count) ? 1 : int.Parse(s_count, NumberStyles.HexNumber);
 			
-			if (count == 0)
-			{
+			if (count == 0) {
 				SingleMediaKeys.Apply(key, InputSimulator.Keyboard.KeyPress);
 				SingleHandlers.Apply(key, act => act());
-				WinampLists.Apply(key, val => Process.Start(Settings.WinampPath, $@"{Settings.WinampPlaylistPath}\{val}.m3u"));
+				YoutubeLists.Apply(key, LaunchYoutube);
 			}
 
 			MultipleMediaKeys.Apply(key, InputSimulator.Keyboard.KeyPress);
@@ -112,9 +119,17 @@ namespace RemoteServer
 			MoveMouse(0, 1 * Acceleration(count));
 		}
 
-		
+		public static void LaunchYoutube(string url)
+		{
+			Process.Start($"https://www.youtube.com/watch?v={url}");
+			Task.Run(async delegate {
+				await Task.Delay(Settings.YoutubeDelay);
+				InputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_F); // fullscreen
+			});
+		}
+
 		private static Settings Settings { get { return Program.Settings; } }
-		private static void Log(string message)
+		public static void Log(string message)
 		{
 			Program.Log(message);
 		}
